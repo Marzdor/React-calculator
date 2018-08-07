@@ -2,23 +2,24 @@ import React from "react";
 
 const Buttons = props => {
   const btnData = [
-    ["equals", "="],
-    ["zero", "0"],
-    ["one", "1"],
-    ["two", "2"],
-    ["three", "3"],
-    ["four", "4"],
-    ["five", "5"],
-    ["six", "6"],
+    ["clear", "CLR"],
+    ["back", "DEL"],
+    ["divide", "/"],
     ["seven", "7"],
     ["eight", "8"],
     ["nine", "9"],
-    ["add", "+"],
-    ["subtract", "-"],
     ["multiply", "*"],
-    ["divide", "/"],
+    ["four", "4"],
+    ["five", "5"],
+    ["six", "6"],
+    ["add", "+"],
+    ["one", "1"],
+    ["two", "2"],
+    ["three", "3"],
+    ["subtract", "-"],
+    ["zero", "0"],
     ["decimal", "."],
-    ["clear", "CLR"]
+    ["equals", "="]
   ];
   const buttons = [];
 
