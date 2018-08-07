@@ -1,0 +1,23 @@
+#calculator {
+  width: 600px;
+  margin: 100px auto;
+  border: solid 2px #000;
+}
+#display {
+  border: solid 1px #000;
+  height: 75px;
+  width: 400px;
+  margin: 50px auto;
+  padding: 5px;
+  font-size: 3rem;
+  line-height: 2;
+}
+#buttonContainer {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  width: 400px;
+  margin: 0 auto;
+}
+button {
+  height: 100px;
+}
