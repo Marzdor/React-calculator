@@ -39,15 +39,14 @@ class App extends Component {
       switch (btn) {
         case "=":
           const input = checkInput(this.state.input);
-          let output;
-
-          input[0].indexOf(".0") >= 0
-            ? (output = eval(input[0]).toFixed(1))
-            : (output = eval(input[0])
-                .toString()
-                .slice(0, 21));
 
           if (input[1]) {
+            let output;
+            input[0].indexOf(".0") >= 0
+              ? (output = eval(input[0]).toFixed(1))
+              : (output = eval(input[0])
+                  .toString()
+                  .slice(0, 21));
             this.setState({
               displayText: output,
               output: output
@@ -108,6 +107,7 @@ function checkInput(input) {
   const isValid = [input, true];
 
   // replace .. with .
+  input = input.replace(/(?!^)[.]{2,}/g, ".");
   input = input.replace(/(?!^)[.]{2,}0/g, ".0");
   const nums = input.split(/[/*+-]/g);
 
