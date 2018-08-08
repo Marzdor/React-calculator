@@ -40,7 +40,7 @@ class App extends Component {
         case "=":
           const input = checkInput(this.state.input);
           let output;
-          console.log(input[0].indexOf(".0"));
+
           input[0].indexOf(".0") >= 0
             ? (output = eval(input[0]).toFixed(1))
             : (output = eval(input[0])
@@ -110,7 +110,7 @@ function checkInput(input) {
   // replace .. with .
   input = input.replace(/(?!^)[.]{2,}0/g, ".0");
   const nums = input.split(/[/*+-]/g);
-  console.log(input);
+
   //Look through numbers look for more than 1 . ex. "2.3.4." => throws error
   if (nums !== null) {
     nums.map(num => {
