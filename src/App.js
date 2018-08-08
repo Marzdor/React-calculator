@@ -18,9 +18,8 @@ class App extends Component {
 
   handleBtnClick(e) {
     const btn = e.target.innerText;
+    let text = this.state.displayText === "0" ? "" : this.state.displayText; // removes leading 0 in display
 
-    let text = this.state.displayText === "0" ? "" : this.state.displayText;
-    console.log(btn);
     if (text.length > 20 && (btn !== "CLR" && btn !== "DEL")) {
       text = "Digit Length Error";
 
@@ -29,7 +28,7 @@ class App extends Component {
         displayText: text,
         showError: true
       });
-
+      // handle error message
       setTimeout(() => {
         this.setState({
           displayText: this.state.output,
@@ -39,22 +38,45 @@ class App extends Component {
     } else if (!this.state.showError) {
       switch (btn) {
         case "=":
-          this.setState({
-            displayText: eval(this.state.input)
-              .toString()
-              .slice(0, 21)
-          });
+          const input = checkInput(this.state.input);
+          let output;
+          console.log(input[0].indexOf(".0"));
+          input[0].indexOf(".0") >= 0
+            ? (output = eval(input[0]).toFixed(1))
+            : (output = eval(input[0])
+                .toString()
+                .slice(0, 21));
+
+          if (input[1]) {
+            this.setState({
+              displayText: output,
+              output: output
+            });
+          } else {
+            // handle error message
+            this.setState({
+              displayText: input[0],
+              showError: true
+            });
+            setTimeout(() => {
+              this.setState({
+                displayText: this.state.input,
+                showError: false
+              });
+            }, 1000);
+          }
           break;
         case "CLR":
           this.setState({
             displayText: "0",
-            input: "0"
+            input: "0",
+            output: "0"
           });
           break;
         case "DEL":
           let newText = this.state.displayText.slice(0, -1);
 
-          newText === "" ? (newText = "0") : null;
+          if (newText === "") newText = "0";
 
           this.setState({
             displayText: newText,
@@ -77,6 +99,49 @@ class App extends Component {
       </div>
     );
   }
+}
+
+// make sure user input is valid and reduces operators
+// operator ex. "+-+" => "+" "/-*/+/" => /
+function checkInput(input) {
+  const operators = input.match(/[/*+-]+/g);
+  const isValid = [input, true];
+
+  // replace .. with .
+  input = input.replace(/(?!^)[.]{2,}0/g, ".0");
+  const nums = input.split(/[/*+-]/g);
+  console.log(input);
+  //Look through numbers look for more than 1 . ex. "2.3.4." => throws error
+  if (nums !== null) {
+    nums.map(num => {
+      if (
+        num.search(/[.]/g) !== -1 && // make sure number even has a .
+        num.match(/[.]/g).length > 1 && // check if more then 1 .
+        isValid[1] // input is also still valid
+      ) {
+        isValid[0] = "# has to many .";
+        isValid[1] = false;
+      }
+      return true;
+    });
+  }
+
+  /// reduces multiple operators into the last one ex. "+*-/" => /
+  if (isValid[1] && operators !== null) {
+    //reduce operators
+    operators.map((op, index) => {
+      op = op.replace(/\-/, "\\-");
+
+      const regex = new RegExp("[" + op + "]{2,}");
+      input = input.replace(regex, op.slice(-1));
+
+      return true;
+    });
+  }
+
+  if (isValid[1]) isValid[0] = input;
+
+  return isValid;
 }
 
 export default App;
