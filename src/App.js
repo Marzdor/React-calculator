@@ -10,7 +10,8 @@ class App extends Component {
       displayText: "0",
       input: "",
       output: "",
-      showError: false
+      showError: false,
+      decimal: false
     };
 
     this.handleBtnClick = this.handleBtnClick.bind(this);
@@ -38,38 +39,35 @@ class App extends Component {
     } else if (!this.state.showError) {
       switch (btn) {
         case "=":
-          const input = checkInput(this.state.input);
+          const input = reduceOperators(this.state.input);
+          let hasDec = false;
 
-          if (input[1]) {
+          if (input) {
             let output;
-            input[0].indexOf(".0") >= 0
-              ? (output = eval(input[0]).toFixed(1))
-              : (output = eval(input[0])
+
+            // if if input has "5.0" returns "5.0" if not a ".0" then returns .0000
+            input.indexOf(".0") >= 0
+              ? (output = eval(input).toFixed(1))
+              : (output = eval(input)
                   .toString()
-                  .slice(0, 21));
+                  .slice(0, 6));
+
+            // check if output has a decimal
+            if (output.search(/[.]/g) !== -1) hasDec = true;
+
             this.setState({
               displayText: output,
-              output: output
+              output: output,
+              decimal: hasDec
             });
-          } else {
-            // handle error message
-            this.setState({
-              displayText: input[0],
-              showError: true
-            });
-            setTimeout(() => {
-              this.setState({
-                displayText: this.state.input,
-                showError: false
-              });
-            }, 1000);
           }
           break;
         case "CLR":
           this.setState({
             displayText: "0",
             input: "0",
-            output: "0"
+            output: "0",
+            decimal: false
           });
           break;
         case "DEL":
@@ -80,6 +78,31 @@ class App extends Component {
           this.setState({
             displayText: newText,
             input: newText
+          });
+          break;
+        case ".":
+          const lastInput = text.slice(-1);
+          if (lastInput === "." || this.state.decimal) {
+            this.setState({
+              displayText: text,
+              input: text
+            });
+          } else {
+            this.setState({
+              displayText: text + btn,
+              input: text + btn,
+              decimal: true
+            });
+          }
+          break;
+        case "/":
+        case "*":
+        case "-":
+        case "+":
+          this.setState({
+            displayText: text + btn,
+            input: text + btn,
+            decimal: false
           });
           break;
         default:
@@ -102,32 +125,11 @@ class App extends Component {
 
 // make sure user input is valid and reduces operators
 // operator ex. "+-+" => "+" "/-*/+/" => /
-function checkInput(input) {
+function reduceOperators(input) {
   const operators = input.match(/[/*+-]+/g);
-  const isValid = [input, true];
-
-  // replace .. with .
-  input = input.replace(/(?!^)[.]{2,}/g, ".");
-  input = input.replace(/(?!^)[.]{2,}0/g, ".0");
-  const nums = input.split(/[/*+-]/g);
-
-  //Look through numbers look for more than 1 . ex. "2.3.4." => throws error
-  if (nums !== null) {
-    nums.map(num => {
-      if (
-        num.search(/[.]/g) !== -1 && // make sure number even has a .
-        num.match(/[.]/g).length > 1 && // check if more then 1 .
-        isValid[1] // input is also still valid
-      ) {
-        isValid[0] = "# has to many .";
-        isValid[1] = false;
-      }
-      return true;
-    });
-  }
 
   /// reduces multiple operators into the last one ex. "+*-/" => /
-  if (isValid[1] && operators !== null) {
+  if (operators !== null) {
     //reduce operators
     operators.map((op, index) => {
       op = op.replace(/\-/, "\\-");
@@ -138,10 +140,7 @@ function checkInput(input) {
       return true;
     });
   }
-
-  if (isValid[1]) isValid[0] = input;
-
-  return isValid;
+  return input;
 }
 
 export default App;
